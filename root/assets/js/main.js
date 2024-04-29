@@ -158,7 +158,8 @@ const inputText = document.querySelector('#campo-text')
 const filmpost = document.getElementById('film-post')
 const title = document.querySelector('.title')
 const desc = document.querySelector('.film-desc')
-
+const informazioni = document.querySelector('#informazioni')
+const infoImg = document.querySelector('.info-img')
 let cliccato = null
 function researchBarClicked() {
 
@@ -216,7 +217,7 @@ function researchBarClicked() {
     //aggiunta alla classe research-image
     img.classList.add('research-image')
 
-    filmpost.appendChild(img)
+    infoImg.appendChild(img)
 
     cliccato = true
 
@@ -243,4 +244,151 @@ links.forEach(function (element) {
     });
 });
 
+function UpperFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+function fetchResult(input) {
+
+    input = UpperFirstLetter(input)
+    console.log(input)
+    const key = "e425ef24"
+    const api = "http://www.omdbapi.com/?apikey=" + key + "&t=" + input; //http://www.omdbapi.com/?apikey=[yourkey]&
+
+    verificaRespose(api)
+
+}
+
+function verificaRespose(url) {
+    fetch(url).then(onSuccess, onFail);
+}
+
+
+function onSuccess(response) {
+    console.log(response.status)
+    // stile in .info-ricerca
+    const researched = document.querySelector('.info-ricerca')
+
+    researched.innerHTML = ''
+
+    /* modifico lo stile della barra di ricerca quando viene effettuata una ricerca.
+
+        -> Ricerca : height: 600px
+        -> Non ricerca: height: 300 px
+        
+    */
+    const clicked = document.querySelector('#researchBar.clicked')
+    clicked.style.height = '600px'
+    researched.classList.add("info-ricerca")
+
+
+
+    const info = {
+        h1: 'Title',
+        h2: 'Year',
+        p: 'Plot'
+    }
+
+    return response.json()
+        .then(data => {
+            console.log(data)
+            if (data !== undefined) {
+                for (const element in info) {
+                    console.log(element)
+
+                    let s = info[element]
+                    const message = document.createTextNode(s + ': ' + data[s])
+                    const text = document.createElement(element)
+
+                    text.appendChild(message)
+                    researched.appendChild(text)
+                    // Qui puoi visualizzare i dati ottenuti dalla chiamata API
+
+                }
+            }
+        });
+}
+
+function onFail(error) {
+    console.log("Error: " + error)
+}
+
+/*  line: 29 const researchBarText = document.getElementById("campo-text")*/
+
+function searchByTitle() {
+    const inputValue = researchBarText.value;
+
+    if (inputValue.trim() != '') {
+        const type = fetchResult(inputValue)
+    }
+}
+
+//const filmpost = document.getElementById('film-post')
+function onresult_json(json) {
+
+    const researched = document.createElement('div')
+
+    filmpost.appendChild(researched)
+    const message = document.createTextNode(json)
+    const text = document.createElement('h1')
+
+    text.appendChild(message)
+    researched.appendChild(text)
+
+}
+
+researchBarText.addEventListener('input', searchByTitle)
+
+/* Autenticazione */
+const endpoint_google = new URL('https://accounts.google.com/o/oauth2/v2/auth')
+
+const currentUrl = window.location.href;
+
+const url = new URL(currentUrl)
+const port = url.port
+const params = {
+    client_id: '878549619916-vqhsuntc53i8rmc5vb2fv68h2lr6if5a.apps.googleusercontent.com',
+    redirect_uri: 'http://localhost:' + port,
+    response_type: 'token',
+    scope: 'profile email',
+    include_granted_scopes: true
+}
+
+
+endpoint_google.searchParams.append('client_id', params.client_id)
+endpoint_google.searchParams.append('redirect_uri', params.redirect_uri)
+endpoint_google.searchParams.append('response_type', params.response_type)
+endpoint_google.searchParams.append('scope', params.scope)
+endpoint_google.searchParams.append('include_granted_scopes', params.include_granted_scopes)
+console.log(endpoint_google);
+
+const cors_proxy = new URL('https://corsproxy.io/?')
+
+const final_url = cors_proxy.href + endpoint_google.href
+console.log(final_url)
+fetch(final_url, {
+
+    method: 'GET',
+    headers: {
+
+        'Content-Type': 'application/json'
+    }
+
+})
+    .then(response => {
+
+        if (response.ok) {
+            return response.json()
+        }
+        else {
+            throw new Error('Errore richiesta OAuth: ' + response.statusText)
+        }
+    })
+    .then(data => {
+        const url_autorizzazione = data.url
+
+    })
+    .catch(error => {
+        console.error(error)
+    })
 

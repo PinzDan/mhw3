@@ -238,12 +238,17 @@ body {
 }
 
 
+.info-ricerca {}
+
+
 #film-post {
     position: absolute;
     left: 10px;
     bottom: 10px;
     display: none;
-    flex-direction: row-reverse;
+    /* cambia dinamicamente in flex */
+    flex-direction: column;
+    height: auto;
     border-radius: var(--default-button-radius);
 
 }
@@ -255,6 +260,18 @@ body {
 #film-post img {
     width: 150px;
     border-radius: var(--default-button-radius);
+}
+
+#informazioni {
+    display: flex;
+    flex-direction: row;
+    border-top: 0.05em solid white;
+}
+
+
+
+.info-text {
+    display: block;
 }
 
 .title {
